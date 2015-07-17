@@ -11,7 +11,7 @@
 #include <mysql/mysql.h>
  
 void *connection_handler(void *);
-void restore_data(char *);//??
+void restore_data(char *);//user defined function
  
 int main(int argc , char *argv[])
 {
