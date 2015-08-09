@@ -1,2 +1,2 @@
 ##前期准备
-ww
+install python and mysql
