@@ -1,0 +1,11 @@
+请在平时的一般编译语句后添加上-lpthread，形如：
+
+gcc -Wall test_1.c -o test_1 -lpthread
+
+这个添加的语句表示链接上pthread.h库
+
+在添加了mysql相关的处理之后，新的编译过程：
+	
+	gcc -c `mysql_config --cflags` filename.c 
+
+	gcc -o filename filename.o `mysql_config --libs`
