@@ -1,2 +1,3 @@
 ##前期准备
-install python and mysql
+1.install python and mysql in you system
+2.install python libs(Beautiful Soup)
