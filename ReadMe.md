@@ -7,10 +7,8 @@
 
 ##前期准备
 1. install **python** and **MySQL** in your system
-
->sudo apt-get install python
->sudo apt-get install mysql-client mysql-server # not very sure about this , if failed , you might need to google it
-
+    >sudo apt-get install python 
+    >sudo apt-get install mysql-client mysql-server # not very sure about this , if failed , you might need to google it
 2. install python libs - **[Beautiful Soup](http://www.crummy.com/software/BeautifulSoup/bs4/doc/)**
 
 
