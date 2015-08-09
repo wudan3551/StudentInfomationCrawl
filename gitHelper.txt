@@ -1,0 +1,5 @@
+#config unicode (this will make a file that cpntains chinese character upload successfully , this means , github will indicate it normally)
+git config --global core.precomposeunicode true
+
+# set the remote repository url
+git remote set-url origin git@github.com:wudan3551/Test.git

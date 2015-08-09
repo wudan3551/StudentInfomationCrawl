@@ -13,6 +13,8 @@
   - get a python script called **get-pip.py**
   - run it as root then you finished install **pip**
   - **pip install beautifulsoup4**
+3. install python mysql driver
+  - sudo apt-get install python-mysqldb
 
 ##程序原理
 [my program](./getStudentInfo.py) mainly consist of 3 part : **web page crawl** , **student information parsing** , **store information into MySQL**
@@ -62,3 +64,9 @@ cursor.commit()
 cursor.close()
 db.close()
 ```
+
+##后记
+1. 非东大人员IP不是内网IP，不能访问学生信息网站。
+2. 由于网页中很多信息是中文的，需要在**python**和**MySQL**中设置编码格式，在我的文件中的第二行设置了`# -*- coding: gb2312 -*-`，
+这样python脚本就能将中文数据写入到MySQL中了，而在MySQL中需要在建立数据库是在后面加上`charcter set utf8`，[这里](./createStudyInfoTable.sql)还有[这里](./createPersonalInfoTable.sql)有我的建立数据库中table的格式.
+3. 目前程序还有一些**bug**，例如抓取一定数量(30个)的学生数据后就停止了，不知道是内存不足了还是程序其他地方出错造成的.

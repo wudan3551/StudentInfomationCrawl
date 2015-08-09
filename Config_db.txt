@@ -1,0 +1,3 @@
+#install python MYSQL driver(for interact with MYSQL)
+sudo apt-get install python-mysqldb
+

@@ -1,0 +1,4 @@
+#mysql utf8 character set
+add "character set utf8" to the end of the varchar(n) , so mysql will treat it as utf8 formate.
+for example :
+alter table StudyInfo modify ResearchDirection varchar(20) character set utf8;

@@ -12,7 +12,7 @@ def getContentByID(soup,ID):
     return temp.string
 
 # main loop
-for inputId in range(130031,132032): #you may change the range of student id for crawl different student
+for inputId in range(130031,132032):
 	# step 1 : get student information from seu student web page
 	#inputId = input('Please Enter a Student ID: ')
 	theURL = "http://202.119.4.150/nstudent/ggxx/xsggxxinfo.aspx?xh=" + str(inputId)
