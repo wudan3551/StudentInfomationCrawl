@@ -12,7 +12,7 @@ def getContentByID(soup,ID):
     return temp.string
 
 # main loop
-for inputId in range(130031,132032):
+for inputId in range(130621,134000):
 	# step 1 : get student information from seu student web page
 	#inputId = input('Please Enter a Student ID: ')
 	theURL = "http://202.119.4.150/nstudent/ggxx/xsggxxinfo.aspx?xh=" + str(inputId)
@@ -113,6 +113,14 @@ for inputId in range(130031,132032):
 
 		cursor = db.cursor()
 
+		#print Nation;
+		#print RollDate;
+		#print Source;
+		if not ResearchDirection:
+		    ResearchDirection = u"δ֪"
+		if not HomeTown:
+		    HomeTown = u"δ֪"
+
 		cursor.execute("insert into StudyInfo values(" + StudentID + ","
 				+ '"' + StudentName + '"' + ","
 				+ '"' + Sex + '"' + ","
@@ -123,6 +131,12 @@ for inputId in range(130031,132032):
 				+ '"' + ResearchDirection + '"'
 				+ ")")
 		db.commit()
+		
+		if not Source:
+		    Source = u"δ֪"
+
+		tempstr = "insert into personalInfo values(" + StudentID + ',"' + StudentName + '","' + Sex + '","' + HomeTown + '","' + BirthYear + '","' + Nation + '","' + RollDate + '","' + Source + '")'
+		print tempstr
 
 		cursor.execute("insert into personalInfo values(" + StudentID + ","
 				+ '"' + StudentName + '"' + ","
