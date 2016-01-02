@@ -5,152 +5,211 @@ import urllib
 from bs4 import BeautifulSoup
 import MySQLdb
 import time
+from datetime import datetime # for get current year and month
 
 # define a function to get infromation from soup by id of html
 def getContentByID(soup,ID):
     temp = soup.find("span",id=ID)
     return temp.string
 
-# main loop
-for inputId in range(130621,134000):
-	# step 1 : get student information from seu student web page
-	#inputId = input('Please Enter a Student ID: ')
-	theURL = "http://202.119.4.150/nstudent/ggxx/xsggxxinfo.aspx?xh=" + str(inputId)
+# Main Start Here
 
-	f = urllib.urlopen(theURL)
-	htmlContent = f.read()
-	f.close()
-	soup = BeautifulSoup(htmlContent,'html.parser');
+# Get a Database Connection
+db = MySQLdb.connect(host='localhost',
+             user='root',
+             passwd='382395',
+             db='StudentInfo',
+             charset='utf8')
+cursor = db.cursor()
 
-	# step 2 : parsing student information by beautiful soup
-	#print "-- Personal Information --"
-	StudentID = getContentByID(soup,"lblxh")
-	#print "StudentID: ",StudentID
+# Get Current Max Student Id in Two Table of Database
+cursor.execute("SELECT MAX(id) FROM StudyInfo")
+max_id1 = (cursor.fetchone())[0] # fetch one row(only one row) from result
+db.commit()
 
-	StudentName = getContentByID(soup,"lblxm")
-	#print "StudentName: ",StudentName
+cursor.execute("SELECT MAX(id) FROM personalInfo")
+max_id2 = (cursor.fetchone())[0] #
+db.commit()
 
-	Sex = getContentByID(soup,"lblxb")
-	#print "Sex: ",Sex
+# make max_id1 equals max_id2
+if max_id1 != max_id2:
+    if max_id1 == max_id2 - 1:
+        cursor.execute("DELETE FROM personalInfo WHERE id = " + str(max_id2))
+        db.commit()
+    elif max_id1 - 1 == max_id2:
+        cursor.execute("DELETE FROM StudyInfo WHERE id = " + str(max_id1))
+        db.commit()
+    else:
+        db.close()
+        print "id in two table not match!"
+        quit()
 
-	HomeTown = getContentByID(soup,"lbljg")
-	#print "Home Town: ",HomeTown
+# Get The Largest Year , The Year Freshest Students Enrolls
+thisYear = datetime.now().year
+if(datetime.now().month < 9):
+    thisYear = thisYear - 1 # Fresh men have't enroll
 
-	BirthYear = getContentByID(soup,"lblcsrq")
-	#print "BirthYear: ",BirthYear
+# Calculate start_sn and end_sn(Student Number Range)
+TotalStudent = 4000
+if not max_id1 and not max_id2:
+    grade = eval(raw_input("Tell me student of witch year you want to know(a number like 13 - year 2013)"))
+    while grade > thisYear and grade <= 0:
+        grade = eval(raw_input("Please give a valid number !"))
+        
+    start_sn = grade * 1000 + 1
+    end_sn = start_sn + TotalStudent
+else:
+    start_sn = max_id1 + 1
+    end_sn = (start_sn / 1000) * 1000 + TotalStudent
 
-	Nation = getContentByID(soup,"lblmz")
-	#print "Nation: ",Nation
+# Finally , we got what we want - start_sn and end_sn
+print "start_sn is " , start_sn
+print "end_sn is " , end_sn
 
-	Marriage = getContentByID(soup,"lblhyzk")
-	#print "Marriage: ",Marriage
 
-	PoliticalFace = getContentByID(soup,"lblzzmm")
-	#print "PoliticalFace: ",PoliticalFace
+print "Start Crawl Data"
 
-	RollDate = getContentByID(soup,"lblrxny")
-	#print "RollDate: ",RollDate
+try:
+    # main loop
+    for inputId in range(start_sn,end_sn):
+        # step 1 : get student information from seu student web page
+        #inputId = input('Please Enter a Student ID: ')
 
-	Source = getContentByID(soup,"lblksly")
-	#print "Source: ",Source
+        theURL = "http://202.119.4.150/nstudent/ggxx/xsggxxinfo.aspx?xh=" + str(inputId)
+        f = urllib.urlopen(theURL)
+        htmlContent = f.read()
+        f.close()
+        soup = BeautifulSoup(htmlContent,'html.parser');
 
-	#temp = soup.find("span",id="lbljtdqm")
-	MailPost = getContentByID(soup,"lbljtdqm")
-	#print "MailPost: ",MailPost
+        # step 2 : parsing student information by beautiful soup
+        #print "-- Personal Information --"
+        StudentID = getContentByID(soup,"lblxh")
+        #print "StudentID: ",StudentID
 
-	#temp = soup.find("span",id="lblrxfs")
-	EntryManer = getContentByID(soup,"lblrxfs")
-	#print "EntryManer: ",EntryManer
+        StudentName = getContentByID(soup,"lblxm")
+        #print "StudentName: ",StudentName
 
-	Education = getContentByID(soup,"lblxl")
-	#print "Education: ",Education
+        Sex = getContentByID(soup,"lblxb")
+        #print "Sex: ",Sex
 
-	#temp = soup.find("span",id="lblbyyx")
-	LastSchool = getContentByID(soup,"lblbyyx")
-	#print "LastSchool: ",LastSchool
+        HomeTown = getContentByID(soup,"lbljg")
+        #print "Home Town: ",HomeTown
 
-	#temp = soup.find("span",id="lblybyrq")
-	GraduateDate = getContentByID(soup,"lblybyrq")
-	#print "GraduateDate: ",GraduateDate
+        BirthYear = getContentByID(soup,"lblcsrq")
+        #print "BirthYear: ",BirthYear
 
-	#temp = soup.find("span",id="lblsflx")
-	isStudyAboard = getContentByID(soup,"lblsflx")
-	#print "isStudyAboard: ",isStudyAboard
+        Nation = getContentByID(soup,"lblmz")
+        #print "Nation: ",Nation
 
-	#temp = soup.find("span",id="lblzymc")
-	Major = getContentByID(soup,"lblzymc")
-	#Major = temp.string
-	#print "Major: ",Major
+        Marriage = getContentByID(soup,"lblhyzk")
+        #print "Marriage: ",Marriage
 
-	#temp = soup.find("span",id="lbldsxm")
-	Tutor = getContentByID(soup,"lbldsxm")
-	#Tutor = temp.string
-	#print "Tutor: ",Tutor
+        PoliticalFace = getContentByID(soup,"lblzzmm")
+        #print "PoliticalFace: ",PoliticalFace
 
-	#temp = soup.find("span",id="lblxwlx")
-	academicDegree = getContentByID(soup,"lblxwlx")
-	#academicDegree = temp.string
-	#print "academicDegree: ",academicDegree
+        RollDate = getContentByID(soup,"lblrxny")
+        #print "RollDate: ",RollDate
 
-	#temp = soup.find("span",id="lblyjfx")
-	#ResearchDirection = temp.string
-	ResearchDirection = getContentByID(soup,"lblyjfx")
-	#print "ResearchDirection: ",ResearchDirection
+        Source = getContentByID(soup,"lblksly")
+        #print "Source: ",Source
 
-	#temp = soup.find("span",id="lblyx")
-	#School = temp.string
-	School = getContentByID(soup,"lblyx")
-	#print "School: ",School
+        #temp = soup.find("span",id="lbljtdqm")
+        MailPost = getContentByID(soup,"lbljtdqm")
+        #print "MailPost: ",MailPost
 
-	# if StudentName not empty store data
-	if StudentName:
-		#step 3: store data into mysql database
-		db = MySQLdb.connect(host='localhost',
-				     user='root',
-				     passwd='382395',
-				     db='StudentInfo',
-				     charset='utf8')
+        #temp = soup.find("span",id="lblrxfs")
+        EntryManer = getContentByID(soup,"lblrxfs")
+        #print "EntryManer: ",EntryManer
 
-		cursor = db.cursor()
+        Education = getContentByID(soup,"lblxl")
+        #print "Education: ",Education
 
-		#print Nation;
-		#print RollDate;
-		#print Source;
-		if not ResearchDirection:
-		    ResearchDirection = u"δ֪"
-		if not HomeTown:
-		    HomeTown = u"δ֪"
+        #temp = soup.find("span",id="lblbyyx")
+        LastSchool = getContentByID(soup,"lblbyyx")
+        #print "LastSchool: ",LastSchool
 
-		cursor.execute("insert into StudyInfo values(" + StudentID + ","
-				+ '"' + StudentName + '"' + ","
-				+ '"' + Sex + '"' + ","
-				+ '"' + LastSchool + '"' + ","
-				+ '"' + School + '"' + ","
-				+ '"' + Major + '"' + ","
-				+ '"' + Tutor + '"' + ","
-				+ '"' + ResearchDirection + '"'
-				+ ")")
-		db.commit()
-		
-		if not Source:
-		    Source = u"δ֪"
+        #temp = soup.find("span",id="lblybyrq")
+        GraduateDate = getContentByID(soup,"lblybyrq")
+        #print "GraduateDate: ",GraduateDate
 
-		tempstr = "insert into personalInfo values(" + StudentID + ',"' + StudentName + '","' + Sex + '","' + HomeTown + '","' + BirthYear + '","' + Nation + '","' + RollDate + '","' + Source + '")'
-		print tempstr
+        #temp = soup.find("span",id="lblsflx")
+        isStudyAboard = getContentByID(soup,"lblsflx")
+        #print "isStudyAboard: ",isStudyAboard
 
-		cursor.execute("insert into personalInfo values(" + StudentID + ","
-				+ '"' + StudentName + '"' + ","
-				+ '"' + Sex + '"' + ","
-				+ '"' + HomeTown + '"' + ","
-				+ '"' + BirthYear + '"' + ","
-				+ '"' + Nation + '"' + ","
-				+ '"' + RollDate + '"' + ","
-				+ '"' + Source + '"'
-				+ ")")
-		db.commit()
+        #temp = soup.find("span",id="lblzymc")
+        Major = getContentByID(soup,"lblzymc")
+        #Major = temp.string
+        #print "Major: ",Major
 
-		cursor.close()
-		db.close()
-	else :
-		print "Invalid Student ID",inputId
-	time.sleep(1) # slow down the crawl speed , maybe this can make our crawling like normal website visit
+        #temp = soup.find("span",id="lbldsxm")
+        Tutor = getContentByID(soup,"lbldsxm")
+        #Tutor = temp.string
+        #print "Tutor: ",Tutor
+
+        #temp = soup.find("span",id="lblxwlx")
+        academicDegree = getContentByID(soup,"lblxwlx")
+        #academicDegree = temp.string
+        #print "academicDegree: ",academicDegree
+
+        #temp = soup.find("span",id="lblyjfx")
+        #ResearchDirection = temp.string
+        ResearchDirection = getContentByID(soup,"lblyjfx")
+        #print "ResearchDirection: ",ResearchDirection
+
+        #temp = soup.find("span",id="lblyx")
+        #School = temp.string
+        School = getContentByID(soup,"lblyx")
+        #print "School: ",School
+
+        # if StudentName not empty store data
+        if StudentName:
+            #step 3: store data into mysql database
+
+            #print Nation;
+            #print RollDate;
+            #print Source;
+            if not ResearchDirection:
+                ResearchDirection = u"δ֪"
+            if not HomeTown:
+                HomeTown = u"δ֪"
+
+            cursor.execute("insert into StudyInfo values(" + StudentID + ","
+                    + '"' + StudentName + '"' + ","
+                    + '"' + Sex + '"' + ","
+                    + '"' + LastSchool + '"' + ","
+                    + '"' + School + '"' + ","
+                    + '"' + Major + '"' + ","
+                    + '"' + Tutor + '"' + ","
+                    + '"' + ResearchDirection + '"'
+                    + ")")
+            db.commit()
+
+            if not Source:
+                Source = u"δ֪"
+
+            tempstr = "insert into personalInfo values(" + StudentID + ',"' + StudentName + '","' + Sex + '","' + HomeTown + '","' + BirthYear + '","' + Nation + '","' + RollDate + '","' + Source + '")'
+            # print tempstr
+
+            cursor.execute("insert into personalInfo values(" + StudentID + ","
+                    + '"' + StudentName + '"' + ","
+                    + '"' + Sex + '"' + ","
+                    + '"' + HomeTown + '"' + ","
+                    + '"' + BirthYear + '"' + ","
+                    + '"' + Nation + '"' + ","
+                    + '"' + RollDate + '"' + ","
+                    + '"' + Source + '"'
+                    + ")")
+            db.commit()
+
+        else :
+            print "Invalid Student ID",inputId
+        # time.sleep(0.02) # slow down the crawl speed , maybe this can make our crawling like normal website visit
+except Exception as excp:
+    print "Exception Happened! "
+    print type(excp)
+    print excp.args
+    print excp
+finally:
+    cursor.close()
+    db.close()  # we need to close mysql connect finally
+    print "Finish Crawing!"

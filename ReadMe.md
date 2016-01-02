@@ -12,7 +12,7 @@
 2. install python libs , you may following the **Installation Guide** part of this - **[Beautiful Soup](http://www.crummy.com/software/BeautifulSoup/bs4/doc/)** , or tack my solution:
   - get a python script called [get-pip.py](./get-pip.py)
   - run it as root then you finished install **pip**
-  - **pip install beautifulsoup4**
+  - **sudo pip install beautifulsoup4**
 3. install python mysql driver
   - **sudo apt-get install python-mysqldb**
 
@@ -25,6 +25,7 @@ import urllib # for crawl the web page
 from bs4 import BeautifulSoup # for parsing student information 
 import MySQLdb # for connect MySQL database 
 import time #for delay 
+from datetime import datetime #for current time and date
 ```
 
 ####web page crawl
@@ -69,7 +70,7 @@ db.close()
 1. 非东大人员IP不是内网IP，不能访问学生信息网站。
 2. 由于网页中很多信息是中文的，需要在**python**和**MySQL**中设置编码格式，在我的文件中的第二行设置了`# -*- coding: gb2312 -*-`，
 这样python脚本就能将中文数据写入到MySQL中了，而在MySQL中需要在建立数据库是在后面加上`charcter set utf8`，[这里](./createStudyInfoTable.sql)还有[这里](./createPersonalInfoTable.sql)有我的建立数据库中table的格式.
-3. 目前程序还有一些**bug**，例如抓取一定数量(30个)的学生数据后就停止了，不知道是内存不足了还是程序其他地方出错造成的.
+3. 目前程序还有一些**bug**，例如抓取一定数量(30个)的学生数据后就停止了，这是因为数据可的列都设成了not null的，而有时会爬到null的值，如有的学生信息不全，没有毕业学校信息，这样导致插入数据库时异常退出
 4. 目前程序中使用的是python自带的parser，还有另一个第三方的parser据说很好用，叫做**lxml**，以后有时间可以看看.
 5. 拿到一定量数目的数据后，我们可以对数据做简单分析，例如查看学生籍贯的分布情况，查看学生男女比例，查看学生年龄分布等等，目前暂时想到用类似这样的语句来获取分析结果,获取湖南省学生信息：`select * from personalInfo where HomeTown like "%湖南%";` 
 6. 感谢**Sanzer**同学告诉我markdown这个神奇的标记语言，让我感觉写这种readme文件也是有点意思的。
